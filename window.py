@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import json
 import pigpio
 import requests
@@ -15,17 +13,17 @@ import argparse
 # ------------------------------------------------------------
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--dry-run", help="Do not set pi pin output.")
-parser.add_argument("--debug", help="Print debug statements", default=False)
-parser.add_argument("--config-file", help="Config file location", required=True)
-parser.add_argument("--gpio-pin", help="GPIO Pinout", default=21)
+parser.add_argument('--dry-run', help='Do not set pi pin output.', nargs='?', const=True)
+parser.add_argument('-d', '--debug', help='Print debug statements', nargs='?', const=True)
+parser.add_argument('--config-file', help='Config file location', required=True)
+parser.add_argument('-p', '--gpio-pin', help='GPIO Pinout', default=21)
 
 args = parser.parse_args()
 
 # Configuration
 
 # GPIO pin number
-pin = args.apio_pin
+pin = args.gpio_pin
 
 # Brightness levels (percent)
 cloudy = 20
@@ -55,9 +53,9 @@ def fetch_weather():
     weather = requests.get('https://therisefamily.com/weather')
 
     if debug:
-        print weather
+        print weather.content
 
-    return json.loads(weather)
+    return json.loads(weather.content)
 
 
 if (settings['timestamp'] + 900) < time.time():
