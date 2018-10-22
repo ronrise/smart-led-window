@@ -28,7 +28,7 @@ pin = args.gpio_pin
 # Brightness levels (percent)
 cloudy = 20
 mixed = 40
-sunny = 75
+sunny = 100
 
 # Config file, persistent configs
 confFile = args.config_file
@@ -100,12 +100,12 @@ now = time.time()
 
 # Sunrise: start brightening 20 mins before, end 70 mins after
 sunriseTime = str(cTime[0]) + '-' + str(cTime[1]) + '-' + str(cTime[2]) + ' ' + settings['sunrise']
-sunriseStart = int(time.mktime(time.strptime(sunriseTime, "%Y-%m-%d %I:%M %p"))) - 1200
+sunriseStart = int(time.mktime(time.strptime(sunriseTime, "%Y-%m-%d %H:%M"))) - 1200
 sunriseEnd = sunriseStart + 5400
 
 # Sunset: start dimming 75 mins before, end 15 mins after
 sunsetTime = str(cTime[0]) + '-' + str(cTime[1]) + '-' + str(cTime[2]) + ' ' + settings['sunset']
-sunsetStart = int(time.mktime(time.strptime(sunsetTime, "%Y-%m-%d %I:%M %p"))) - 4500
+sunsetStart = int(time.mktime(time.strptime(sunsetTime, "%Y-%m-%d %H:%M"))) - 4500
 sunsetEnd = sunsetStart + 5400
 
 # Determine the current brightness
@@ -140,7 +140,8 @@ def get_change_amt(current, target):
 
 
 # Set the brightness gradually
-pi = pigpio.pi()
+if not args.dry_run:
+    pi = pigpio.pi()
 
 if not args.dry_run:
     currentBrightness = pi.get_PWM_dutycycle(pin)
@@ -155,6 +156,7 @@ if targetBrightness > currentBrightness:
         if not args.dry_run:
             pi.set_PWM_dutycycle(pin, currentBrightness)
         else:
+            print 'setting pin: ' + str(pin) + ' to ' + str(targetBrightness)
             break
 
         amt = get_change_amt(currentBrightness, targetBrightness)
@@ -168,6 +170,7 @@ elif targetBrightness < currentBrightness:
         if not args.dry_run:
             pi.set_PWM_dutycycle(pin, currentBrightness)
         else:
+            print 'setting pin: ' + str(pin) + ' to ' + str(targetBrightness)
             break
 
         amt = get_change_amt(currentBrightness, targetBrightness)
